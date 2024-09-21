@@ -29,8 +29,15 @@ Then, navigate to the `home` directory and run the following command:
 ```
 python generatescripts.py <foldername>
 ```
-where `<foldername>` is the name of the folder containing the data. You need not include the full path to the folder if the folder is in your scratch directory. The script first creates subfolders in your data folder for the output files. It then generates a job script for each file in the folder `scripts`. To submit the job scripts to the HPC cluster, run the following command:
+where `<foldername>` is the name of the folder containing the data. You need not include the full path to the folder if the folder is in your scratch directory. The script first creates subfolders in your data folder for the output files. It then generates a job script for each file in the folder `scripts`. 
+
+Finally, to submit the job scripts to the HPC cluster, run the following command:
 ```
 ./run_all.sh
 ```
 This will submit all the job scripts to the HPC cluster. You can monitor the status of the jobs using the `squeue --me` command.
+
+As each file is processed, the job script outputs the output files directly to the input folder. When the job script is complete, the output files are moved to the corresponding output folders. If your files are not moved to the correct output folders, this may indicate insufficient time for the job to complete. You can increase the time limit through `python generatescripts.py <foldername> --run-time <time>` where <time> is the time limit in the format `"HH:MM:SS"`. You can also specify the amount of memory allocated to the job using `python generatescripts.py <foldername> -m <memory>` where <memory> is the memory limit in the format `"XXGB"`.
+
+## Troubleshooting
+If you encounter any issues with the job scripts, you can check the error logs in the `logfiles` directory. The error logs contain the standard output and error messages from the job scripts. You can also check the status of the jobs using the `squeue --me` command.

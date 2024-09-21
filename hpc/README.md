@@ -6,8 +6,12 @@ This directory contains the scripts and configuration files for running image pr
 
 ## Preliminaries
 Copy the `home` directory to the home directory on the HPC cluster. The directory should contain the following files:
-- `config.yaml`: configuration file for the image processing code (see below for more details)
+- `config.yaml`: configuration file for the image processing code (see below for more details) 
 - `generatescripts.py`: script for generating job scripts for the HPC cluster
+
+For running ImageJ/ThunderSTORM on the HPC cluster, you would need the following:
+- imagej.sif: Singularity container for ImageJ containing ThunderSTORM
+- fake_zcali.yaml: Dummy z calibration file for ThunderSTORM to run astigmatism analysis
 
 ## Configuration
 The `config.yaml` file contains the following fields:

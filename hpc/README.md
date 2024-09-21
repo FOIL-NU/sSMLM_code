@@ -8,13 +8,14 @@ Copy the `home` directory to the home directory on the HPC cluster. The director
 - `generatescripts.py`: script for generating job scripts for the HPC cluster
 
 For running ImageJ/ThunderSTORM on the HPC cluster, you would need the following:
-- imagej.sif: Singularity container for ImageJ containing ThunderSTORM
-- fake_zcali.yaml: Dummy z calibration file for ThunderSTORM to run astigmatism analysis
+- `imagej.sif`: Singularity container for ImageJ containing ThunderSTORM
+- `fake_zcali.yaml`: Dummy z calibration file for ThunderSTORM to run astigmatism analysis
 
 Finally, the `imagej_scripts` directory contains the ImageJ macro scripts for running ThunderSTORM on the HPC cluster. It contains the following files:
-- process_0th.ijm: ImageJ macro script for processing single color images
-- process_2ddwp.ijm: ImageJ macro script for processing multi-color images with 2D DWP
-- process_3ddwp.ijm: ImageJ macro script for processing multi-color images with 3D DWP
+- `process_0th.ijm`: ImageJ macro script for processing single color images
+- `process_2ddwp.ijm`: ImageJ macro script for processing multi-color images with 2D-DWP
+- `process_3ddwp.ijm`: ImageJ macro script for processing multi-color images with 3D-DWP
+- `process_sddwp.ijm`: ImageJ macro script for processing multi-color images with SD-DWP
 
 ## Configuration
 The `config.yaml` file contains the following fields:

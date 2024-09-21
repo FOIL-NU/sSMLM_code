@@ -4,7 +4,7 @@
 
 This directory contains the scripts and configuration files for running image processing code on the HPC cluster.
 
-## Prelimiaries
+## Preliminaries
 Copy the `home` directory to the home directory on the HPC cluster. The directory should contain the following files:
 - `config.yaml`: configuration file for the image processing code (see below for more details)
 - `generatescripts.py`: script for generating job scripts for the HPC cluster

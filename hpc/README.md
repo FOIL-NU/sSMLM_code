@@ -1,5 +1,4 @@
 # Overview
-
 This directory contains the scripts and configuration files for running image processing code on the HPC cluster.
 
 ## Preliminaries
@@ -22,7 +21,7 @@ The `config.yaml` file contains the following fields:
 - `allocation`: input the allocation id for the HPC cluster
 - `username`: input the username for the HPC cluster
 
-## Usage
+## Processing files
 First, transfer your data to the HPC cluster, preferably in a subfolder in the `scratch` directory. Next, copy the relevant ImageJ macro script to the same directory as the data. Open the ImageJ macro script and modify the roi regions for the 0th and 1st order images to match the regions in your data.
 
 Then, navigate to the `home` directory and run the following command:
@@ -37,9 +36,10 @@ Finally, to submit the job scripts to the HPC cluster, run the following command
 ```
 This will submit all the job scripts to the HPC cluster. You can monitor the status of the jobs using the `squeue --me` command.
 
+### Troubleshooting
 As each file is processed, the job script outputs the output files directly to the input folder. When the job script is complete, the output files are moved to the corresponding output folders. If your files are not moved to the correct output folders, this may indicate insufficient time for the job to complete. You can increase the time limit through `python generatescripts.py <foldername> --run-time <time>` where <time> is the time limit in the format `"HH:MM:SS"`. The default time limit is 3 hours.
 
 You can also specify the amount of memory allocated to the job using `python generatescripts.py <foldername> -m <memory>` where <memory> is the memory limit in the format `"XXG"`. The default memory limit is 32G.
 
-## Troubleshooting
+## Other troubleshooting
 If you encounter any issues with the job scripts, you can check the error logs in the `logfiles` directory. The error logs contain the standard output and error messages from the job scripts. You can also check the status of the jobs using the `squeue --me` command.

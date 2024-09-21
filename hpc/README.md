@@ -37,7 +37,9 @@ Finally, to submit the job scripts to the HPC cluster, run the following command
 ```
 This will submit all the job scripts to the HPC cluster. You can monitor the status of the jobs using the `squeue --me` command.
 
-As each file is processed, the job script outputs the output files directly to the input folder. When the job script is complete, the output files are moved to the corresponding output folders. If your files are not moved to the correct output folders, this may indicate insufficient time for the job to complete. You can increase the time limit through `python generatescripts.py <foldername> --run-time <time>` where <time> is the time limit in the format `"HH:MM:SS"`. You can also specify the amount of memory allocated to the job using `python generatescripts.py <foldername> -m <memory>` where <memory> is the memory limit in the format `"XXGB"`.
+As each file is processed, the job script outputs the output files directly to the input folder. When the job script is complete, the output files are moved to the corresponding output folders. If your files are not moved to the correct output folders, this may indicate insufficient time for the job to complete. You can increase the time limit through `python generatescripts.py <foldername> --run-time <time>` where <time> is the time limit in the format `"HH:MM:SS"`. The default time limit is 3 hours.
+
+You can also specify the amount of memory allocated to the job using `python generatescripts.py <foldername> -m <memory>` where <memory> is the memory limit in the format `"XXG"`. The default memory limit is 32G.
 
 ## Troubleshooting
 If you encounter any issues with the job scripts, you can check the error logs in the `logfiles` directory. The error logs contain the standard output and error messages from the job scripts. You can also check the status of the jobs using the `squeue --me` command.

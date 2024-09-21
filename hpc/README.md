@@ -29,7 +29,7 @@ Then, navigate to the `home` directory and run the following command:
 ```
 python generatescripts.py <foldername>
 ```
-where `<foldername>` is the name of the folder containing the data. This will generate a job script for each file in the folder `scripts`. To submit the job scripts to the HPC cluster, run the following command:
+where `<foldername>` is the name of the folder containing the data. You need not include the full path to the folder if the folder is in your scratch directory. The script first creates subfolders in your data folder for the output files. It then generates a job script for each file in the folder `scripts`. To submit the job scripts to the HPC cluster, run the following command:
 ```
 ./run_all.sh
 ```

@@ -11,13 +11,20 @@ For running ImageJ/ThunderSTORM on the HPC cluster, you would need the following
 - imagej.sif: Singularity container for ImageJ containing ThunderSTORM
 - fake_zcali.yaml: Dummy z calibration file for ThunderSTORM to run astigmatism analysis
 
+Finally, the `imagej_scripts` directory contains the ImageJ macro scripts for running ThunderSTORM on the HPC cluster. It contains the following files:
+- process_0th.ijm: ImageJ macro script for processing single color images
+- process_2ddwp.ijm: ImageJ macro script for processing multi-color images with 2D DWP
+- process_3ddwp.ijm: ImageJ macro script for processing multi-color images with 3D DWP
+
 ## Configuration
 The `config.yaml` file contains the following fields:
 - `allocation`: input the allocation id for the HPC cluster
 - `username`: input the username for the HPC cluster
 
 ## Usage
-First, transfer your data to the HPC cluster, preferably to the `scratch` directory. Then, navigate to the `home` directory and run the following command:
+First, transfer your data to the HPC cluster, preferably in a subfolder in the `scratch` directory. Next, copy the relevant ImageJ macro script to the same directory as the data. Open the ImageJ macro script and modify the roi regions for the 0th and 1st order images to match the regions in your data.
+
+Then, navigate to the `home` directory and run the following command:
 ```
 python generatescripts.py <foldername>
 ```

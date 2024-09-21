@@ -1,6 +1,4 @@
-# hpc
-
-## Overview
+# Overview
 
 This directory contains the scripts and configuration files for running image processing code on the HPC cluster.
 

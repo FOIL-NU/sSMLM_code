@@ -4,7 +4,7 @@ This directory contains the scripts and configuration files for running image pr
 ## Preliminaries
 Copy the `home` directory to the home directory on the HPC cluster. The directory should contain the following files:
 - `config.yaml`: configuration file for the image processing code (see below for more details) 
-- `generatescripts.py`: script for generating job scripts for the HPC cluster
+- `makescripts.py`: script for making job scripts for the HPC cluster
 
 For running ImageJ/ThunderSTORM on the HPC cluster, you would need the following:
 - `imagej.sif`: Singularity container for ImageJ containing ThunderSTORM
@@ -26,7 +26,7 @@ First, transfer your data to the HPC cluster, preferably in a subfolder in the `
 
 Then, navigate to the `home` directory and run the following command:
 ```
-python generatescripts.py <foldername>
+python makescripts.py <foldername>
 ```
 where `<foldername>` is the name of the folder containing the data. You need not include the full path to the folder if the folder is in your scratch directory. The script first creates subfolders in your data folder for the output files. It then generates a job script for each file in the folder `scripts`. 
 
@@ -39,6 +39,6 @@ This will submit all the job scripts to the HPC cluster. You can monitor the sta
 ### Troubleshooting
 As each file is processed, the job script outputs the output files directly to the input folder. When the job script is complete, the output files are moved to the corresponding output folders. If you encounter any issues with the job scripts, you can check the error logs in the `logfiles` directory. The error logs contain the standard output and error messages from the job scripts. You can also check the status of the jobs using the `squeue --me` command.
 
-Generally, if your files are not moved to the correct output folders, this may indicate insufficient time for the job to complete. You can increase the time limit through `python generatescripts.py <foldername> --run-time <time>` where <time> is the time limit in the format `"HH:MM:SS"`. The default time limit is 3 hours.
+Generally, if your files are not moved to the correct output folders, this may indicate insufficient time for the job to complete. You can increase the time limit through `python makescripts.py <foldername> --run-time <time>` where <time> is the time limit in the format `"HH:MM:SS"`. The default time limit is 3 hours.
 
-If you encounter memory issues while running the job scripts, you can also specify the amount of memory allocated to the job using `python generatescripts.py <foldername> -m <memory>` where <memory> is the memory limit in the format `"XXG"`. The default memory limit is 32G.
+If you encounter memory issues while running the job scripts, you can also specify the amount of memory allocated to the job using `python makescripts.py <foldername> -m <memory>` where <memory> is the memory limit in the format `"XXG"`. The default memory limit is 32G.

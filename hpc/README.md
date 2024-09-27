@@ -7,7 +7,7 @@ Copy the `home` directory to the home directory on the HPC cluster. The director
 - `makescripts.py`: script for making job scripts for the HPC cluster
 
 For running ImageJ/ThunderSTORM on the HPC cluster, you would need the following:
-- `imagej.sif`: Singularity container for ImageJ containing ThunderSTORM
+- `imagej.sif`: Singularity container for ImageJ containing ThunderSTORM. Download the container [here](https://cloud.sylabs.io/library/whyeo/collection/imagej) and place it in the `home` directory
 - `fake_zcali.yaml`: Dummy z calibration file for ThunderSTORM to run astigmatism analysis
 
 Finally, the `imagej_scripts` directory contains the ImageJ macro scripts for running ThunderSTORM on the HPC cluster. It contains the following files:
@@ -20,6 +20,8 @@ Finally, the `imagej_scripts` directory contains the ImageJ macro scripts for ru
 The `config.yaml` file contains the following fields:
 - `allocation`: input the allocation id for the HPC cluster
 - `username`: input the username for the HPC cluster
+
+Input your allocation id and username in the `config.yaml` file before running any scripts.
 
 ## Processing files
 First, transfer your data to the HPC cluster, preferably in a subfolder in the `scratch` directory. Next, copy the relevant ImageJ macro script to the same directory as the data. Open the ImageJ macro script and modify the roi regions for the 0th and 1st order images to match the regions in your data.

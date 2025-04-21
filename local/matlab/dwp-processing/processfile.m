@@ -11,6 +11,7 @@ default_img_pxsz = 110;
 default_zcali_path = nan;
 default_plot_hist = false;
 default_central_wavelength = 700;
+default_corr = [1, 1, nan, nan];
 
 % define the optional parameters
 addParameter(parser, 'corr_pxsz', default_corr_pxsz, @isnumeric);
@@ -22,6 +23,7 @@ addParameter(parser, 'plot_hist', default_plot_hist, @islogical);
 addParameter(parser, 'order0_roi', nan(1,4), @isnumeric);
 addParameter(parser, 'order1_roi', nan(1,4), @isnumeric);
 addParameter(parser, 'central_wavelength', default_central_wavelength, @isnumeric);
+addParameter(parser, 'corr', default_corr, @isnumeric);
 
 % parse the input
 parse(parser, varargin{:});
@@ -36,6 +38,7 @@ plot_hist = parser.Results.plot_hist;
 order0_roi = parser.Results.order0_roi;
 order1_roi = parser.Results.order1_roi;
 central_wavelength = parser.Results.central_wavelength;
+corr = parser.Results.corr;
 
 if nargin < 3
     error('specify image type');
@@ -99,24 +102,29 @@ else
     warning('No spectral calibration file found');
 end
 
-% correct the x and y values of the 1st order
-[xcomp, ycomp] = corr_xy(ts_table0, ts_table1, 1, 1, corr_pxsz);
+if any(isnan(corr))
+    % correct the x and y values of the 1st order
+    [xcomp, ycomp] = corr_xy(ts_table0, ts_table1, 1, 1, corr_pxsz);
+else
+    xcomp = corr(3);
+    ycomp = corr(4);
+end
 
 if isstruct(speccali)
     corr = [speccali.xscale(idx), speccali.yscale(idx), xcomp, ycomp];
 else
-    corr = [1, 1, xcomp, ycomp];
+    corr = [1, 1, xcomp, ycomp]
 end
 
 % correct the x1 and y1 values with the correction factors
-ts_table1{:, 'x [nm]'} = ts_table1{:, 'x [nm]'} + xcomp;
-ts_table1{:, 'y [nm]'} = ts_table1{:, 'y [nm]'} + ycomp;
+ts_table1{:, 'x [nm]'} = (ts_table1{:, 'x [nm]'} + xcomp) / corr(1);
+ts_table1{:, 'y [nm]'} = (ts_table1{:, 'y [nm]'} + ycomp) / corr(2);
 
 % sort the tables by frame
 ts_table0 = sortrows(ts_table0, 'frame');
 ts_table1 = sortrows(ts_table1, 'frame');
 
-[matched_idx0, matched_idx1] = matchlocalizations(ts_table0, ts_table1);
+[matched_idx0, matched_idx1] = matchlocalizations(ts_table0, ts_table1, img_type);
 
 % filter the localizations by the matched indices
 tsnew_table0 = ts_table0(ismember(ts_table0{:, 'id'}, matched_idx0), :);
@@ -176,9 +184,9 @@ end
 % offset0 [photon],  offset1 [photon], bkgstd [photon], ...
 % bkgstd0 [photon], bkgstd1 [photon]
 
-ts_output = table('Size', [length(tsnew_table0{:, 'frame'}), 22], ...
+ts_output = table('Size', [length(tsnew_table0{:, 'frame'}), 23], ...
     'VariableNames', {'id', 'frame', ...
-    'x [nm]', 'y [nm]', 'z [nm]', 'centroid [nm]', ...
+    'x [nm]', 'y [nm]', 'z [nm]', 'centroid [nm]', 'centroid2 [nm]', ...
     'sigmax0 [nm]', 'sigmay0 [nm]', 'sigmax1 [nm]', 'sigmay1 [nm]', ...
     'uncertainty [nm]', 'uncertainty0 [nm]', 'uncertainty1 [nm]', ...
     'intensity [photon]', 'intensity0 [photon]', 'intensity1 [photon]', ...
@@ -187,7 +195,7 @@ ts_output = table('Size', [length(tsnew_table0{:, 'frame'}), 22], ...
     'VariableTypes', {'uint32', 'uint32', 'double', 'double', 'double', ...
     'double', 'double', 'double', 'double', 'double', 'double', 'double', ...
     'double', 'double', 'double', 'double', 'double', 'double', 'double', ...
-    'double', 'double', 'double'});
+    'double', 'double', 'double', 'double'});
 
 % fill in the values
 ts_output{:, 'id'} = (1:length(tsnew_table0{:, 'frame'}))';
@@ -230,8 +238,10 @@ if isstruct(speccali)
     % disp(mean((tsnew_table1{:, 'x [nm]'} - xcomp + xoff) - ...
     %     tsnew_table0{:, 'x [nm]'}));
     % disp(speccali.xshift);
+    ts_output{:, 'centroid2 [nm]'} = tsnew_table1{:, 'x [nm]'} - tsnew_table0{:, 'x [nm]'};
 else
     ts_output{:, 'centroid [nm]'} = tsnew_table1{:, 'x [nm]'} - tsnew_table0{:, 'x [nm]'};
+    ts_output{:, 'centroid2 [nm]'} = tsnew_table1{:, 'x [nm]'} - tsnew_table0{:, 'x [nm]'};
 end
 
 if ismember('sigma1 [nm]', tsnew_table0.Properties.VariableNames)
@@ -276,10 +286,16 @@ recon_im = ash2(ts_output{:,'x [nm]'}, ts_output{:,'y [nm]'}, recon_pxsz);
 end
 
 
-function [matched_idx0, matched_idx1] = matchlocalizations(ts_table0, ts_table1)
+function [matched_idx0, matched_idx1] = matchlocalizations(ts_table0, ts_table1, img_type)
 % extract the frames of the tables
 frame0 = ts_table0{:, 'frame'};
 frame1 = ts_table1{:, 'frame'};
+
+if strcmpi(img_type, 'sdwp')
+    SDWP = true;
+else
+    SDWP = false;
+end
 
 n_frames = max([frame0; frame1]);
 
@@ -293,7 +309,7 @@ matched_idx1 = nan(min([length(idx0), length(idx1)]), 1);
 curr_idx = 1;
 
 % print that we are matching the localizations
-upd = textprogressbar(n_frames, 'startmsg', 'Matching localizations: ', 'showbar', true');
+upd = textprogressbar(n_frames, 'startmsg', 'Matching localizations: ', 'showbar', true);
 
 for i_frame = 1:n_frames
     % get the localizations in the current frame
@@ -311,7 +327,11 @@ for i_frame = 1:n_frames
     tmp_y1 = ts_table1{curr_idx1, 'y [nm]'};
     
     % find the closest localizations
-    [knn_idx1, ~] = knnsearch([tmp_x0, tmp_y0], [tmp_x1, tmp_y1], 'k', 1, 'nsmethod', 'exhaustive');
+    if SDWP
+        [knn_idx1, ~] = knnsearch([tmp_x0, tmp_y0], [tmp_x1, tmp_y1], 'k', 1, 'nsmethod', 'exhaustive', 'distance', 'seuclidean', 'scale', [2, 1]);
+    else
+        [knn_idx1, ~] = knnsearch([tmp_x0, tmp_y0], [tmp_x1, tmp_y1], 'k', 1, 'nsmethod', 'exhaustive', 'distance', 'seuclidean', 'scale', [2, 1]);
+    end
 
     if isempty(knn_idx1)
         continue
